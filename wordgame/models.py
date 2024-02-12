@@ -12,7 +12,7 @@ class MatchList(models.Model):
     players_count=models.IntegerField(null=True,blank=True)
     word_count=models.IntegerField(null=True,blank=True)
     finished=models.BooleanField(default=False)
-    progress=models.CharField(max_length=20,default='No started')
+    progress=models.CharField(max_length=20,default='no active')
     created_at=models.DateTimeField(auto_now_add=True,db_index=True)
     DisplyFields=['match_ID','channel_name','channel_ID','finished']
     SearchFilds=['channel_ID','channel_name','match_ID','players_count','word_count']

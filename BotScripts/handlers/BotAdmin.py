@@ -6,6 +6,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.filters import BaseFilter
 from wordgame.models import GamersList,MatchList,ChempionsList
 from BotScripts.functions import BotFuctions
+
 import csv
 
 
@@ -21,6 +22,9 @@ django.setup()
 
 router=Router()
 chat_id=None
+
+
+
 
 
 
@@ -57,22 +61,34 @@ async def fff(message:Message):
 @router.callback_query(F.data=='join')
 async def join_game(callback:CallbackQuery):  
     chat_id=callback.message.chat.id
-    channel_info=await bot.get_chat(chat_id=chat_id)
-    last_match=MatchList.objects.last()
-    try:
-        if last_match.finished ==False:
-          
-                data=BotFuctions.check_users(callback=callback.message.from_user.id) 
-                print(data)     
-                await callback.answer('You are practicipating in the game',show_alert=True)
-        elif last_match.finished==True:
-            await callback.answer('You are already practicipating in the game!\n Please wait for others to join',show_alert=True)
-            fsm_save=MatchList(channel_name=channel_info.title,channel_ID=channel_info.id)
-            fsm_save2=GamersList(user_id=callback.from_user.id,user_name=callback.from_user.full_name,match_ID=last_match.match_ID+1)
-            fsm_save.save()
-            fsm_save2.save()
-    except AttributeError:
-        pass
+    chat_info= await bot.get_chat(chat_id=chat_id)
+    data=BotFuctions.game_boolen()
+    print(data)
+  #  print(chat_info)
+    data_id=BotFuctions.get_ID(chat_id=chat_id,chat_name=chat_info.title)
+    print(data_id[1])
+    if data_id[1]==True:
+        players=BotFuctions.connect_gamers(user_id=callback.from_user.id,user_name=callback.from_user.full_name,match_ID=data_id[0])
+        show=BotFuctions.show_players(match_id=data_id[0])
+        
+        await callback.message.answer(text=f"Match_ID: {data_id[0]}\nPlayers:\n{[i.user_name  for i in show]}")
+    
+
+
+    #try:
+    #    if last_match.finished ==False:
+    #      
+    #            data=BotFuctions.check_users(callback=callback.message.from_user.id) 
+    #            print(data)     
+    #            await callback.answer('You are practicipating in the game',show_alert=True)
+    #    elif last_match.finished==True:
+    #        await callback.answer('You are already practicipating in the game!\n Please wait for others to join',show_alert=True)
+    #        fsm_save=MatchList(channel_name=channel_info.title,channel_ID=channel_info.id)
+    #        fsm_save2=GamersList(user_id=callback.from_user.id,user_name=callback.from_user.full_name,match_ID=last_match.match_ID+1)
+    #        fsm_save.save()
+    #        fsm_save2.save()
+    #except AttributeError:
+    #    pass
         
    
 @router.message()
