@@ -6,17 +6,20 @@ from django.db.models.functions import Now
 
 
 class MatchList(models.Model):
-    channel_name=models.CharField(max_length=200)
+    channel_name=models.CharField(max_length=200)   
     channel_ID=models.IntegerField()  
     match_ID=models.AutoField(primary_key=True)
     players_count=models.IntegerField(null=True,blank=True)
     word_count=models.IntegerField(null=True,blank=True)
+    start_game=models.BooleanField(default=False)
     finished=models.BooleanField(default=False)
     progress=models.CharField(max_length=20,default='no active')
     created_at=models.DateTimeField(auto_now_add=True,db_index=True)
-    DisplyFields=['match_ID','channel_name','channel_ID','finished']
+    DisplyFields=['match_ID','channel_name','channel_ID','start_game']
     SearchFilds=['channel_ID','channel_name','match_ID','players_count','word_count']
     FiltersFields=['channel_name']
+    
+        
 
 
         
@@ -27,6 +30,7 @@ class GamersList(models.Model):
     user_id=models.IntegerField()
     user_name=models.CharField(max_length=200)
     found_word_count=models.IntegerField(null=True,blank=True)
+    finished=models.BooleanField(default=False)
     created_at=models.DateTimeField(auto_now_add=True,db_index=True)
     Match_List=models.ForeignKey(to=MatchList,on_delete=models.CASCADE,null=True,blank=True)  
     DisplayFields=['match_ID','user_name']
