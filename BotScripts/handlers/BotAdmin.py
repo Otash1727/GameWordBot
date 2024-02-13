@@ -59,20 +59,34 @@ async def fff(message:Message):
         await bot.send_message(chat_id=chat_id,text="You can play only with an opponent(or more) and in a group.")
     
 @router.callback_query(F.data=='join')
-async def join_game(callback:CallbackQuery):  
+async def join_game(callback:CallbackQuery):
+    # info channel  
     chat_id=callback.message.chat.id
     chat_info= await bot.get_chat(chat_id=chat_id)
     data=BotFuctions.game_boolen()
-    print(data)
-  #  print(chat_info)
-    data_id=BotFuctions.get_ID(chat_id=chat_id,chat_name=chat_info.title)
-    print(data_id[1])
-    if data_id[1]==True:
-        players=BotFuctions.connect_gamers(user_id=callback.from_user.id,user_name=callback.from_user.full_name,match_ID=data_id[0])
-        show=BotFuctions.show_players(match_id=data_id[0])
-        
-        await callback.message.answer(text=f"Match_ID: {data_id[0]}\nPlayers:\n{[i.user_name  for i in show]}")
-    
+    if data==False:
+        #data1=BotFuctions.check_creator(user_id=callback.from_user.id,user_name=callback.from_user.full_name)
+        #if data1 == False:
+            fsm=BotFuctions.create_game(chat_id=chat_id,chat_name=chat_info.title,user_id=callback.from_user.id,user_name=callback.from_user.full_name)
+            await callback.answer('You are already practicipating in the game!\n Please wait for others to join',show_alert=True)
+        #else:
+            await bot.send_message(chat_id=chat_id,text=f'{callback.from_user.full_name}started the match')
+        #connect_palayers=BotFuctions.connect_gamers()
+    else:
+           
+    #finished true will be progress false
+#    
+#    
+#    print(data)
+#  #  print(chat_info)
+#    data_id=BotFuctions.get_ID(chat_id=chat_id,chat_name=chat_info.title)
+#    print(data_id[1])
+#    if data_id[1]==True:
+#        players=BotFuctions.connect_gamers(user_id=callback.from_user.id,user_name=callback.from_user.full_name,match_ID=data_id[0])
+#        show=BotFuctions.show_players(match_id=data_id[0])
+#        
+#        await callback.message.answer(text=f"Match_ID: {data_id[0]}\nPlayers:\n{[i.user_name  for i in show]}")
+#    
 
 
     #try:
