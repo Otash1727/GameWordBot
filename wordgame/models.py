@@ -3,6 +3,7 @@ from django import forms
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models.functions import Now
+import csv
 
 
 class MatchList(models.Model):
@@ -20,7 +21,10 @@ class MatchList(models.Model):
     FiltersFields=['channel_name']
     
         
-
+class EnglishDictionary(models.Model):    
+    dictionary=models.CharField(max_length=300)
+    DisplayField=['dictionary']
+        
 
         
     

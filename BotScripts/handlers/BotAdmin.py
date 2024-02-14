@@ -7,8 +7,7 @@ from aiogram.filters import BaseFilter
 from wordgame.models import GamersList,MatchList,ChempionsList
 from BotScripts.functions import BotFuctions
 
-import csv
-import sys
+
 
 
 
@@ -54,7 +53,8 @@ async def runbot(message:Message):
     await bot.send_message(chat_id=message.from_user.id,text='Hello send /help command to know what you can do with me')
     await bot.send_message(chat_id=message.from_user.id,text='The game is played only with an opponent and in a group.')
     await bot.set_my_commands([BotCommand(command='start',description='Run the bot'),BotCommand(command='help',description='If you want to know more about our bot, this command will help you')],BotCommandScopeChat(chat_id=message.from_user.id))
-   
+
+
 @router.message(Command('help'))
 async def help(message:Message):
     await bot.send_message(chat_id=message.from_user.id,text='This is a word chain game for English learners!')
@@ -119,8 +119,13 @@ async def empty_handler(message:Message):
     chat_id=message.chat.id
     last_id=BotFuctions.match_info()
     show_player=BotFuctions.show_players(match_id=last_id.match_ID)    
-    if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False:
-        print(1)
+    if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False: 
+        dictionary=['']
+       
+        if message.text in dictionary:
+            print('yes')
+        else:
+            print('you make mistake')
     else:   
         print('oddiy rejim')
         await bot.set_my_commands([BotCommand(command='new_match',description='Star new match')],BotCommandScopeChat(chat_id=chat_id))
@@ -180,8 +185,4 @@ async def empty_handler(message:Message):
 
 
  
-    #with open('englishDictionary.csv',mode='r') as csvfile:
-    #    spamreader=csv.reader(csvfile)
-    #    for row in spamreader:
-    #        pass
             
