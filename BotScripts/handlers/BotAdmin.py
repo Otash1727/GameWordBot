@@ -116,24 +116,38 @@ async def start_game(callback:CallbackQuery):
     
 @router.message()
 async def empty_handler(message:Message):
+    words=[]
     chat_id=message.chat.id
     last_id=BotFuctions.match_info()
     show_player=BotFuctions.show_players(match_id=last_id.match_ID)    
     if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False: 
-        dictionary=['']
+        print(45)
        
-        if message.text in dictionary:
-            print('yes')
-        else:
-            print('you make mistake')
+        #if message.text in dictionary:
+        #    print('yes')
+        #else:
+        #    print('you make mistake')
     else:   
         print('oddiy rejim')
         await bot.set_my_commands([BotCommand(command='new_match',description='Star new match')],BotCommandScopeChat(chat_id=chat_id))
         last_id=BotFuctions.match_info()
         show_player=BotFuctions.show_players(match_id=last_id.match_ID)
         print([i.user_id for i in show_player])     
-        print(message.text)
-
+        data=BotFuctions.dictionary1()
+        for i in data:
+            if message.text in i.dictionary:
+                print(1)
+                break
+                
+                
+            else:
+                print(0)
+        
+        #if any(message.text in i.dictionary for i in data):
+        #    print(5)
+        #else:
+        #    print('dalbayob')
+    
     
     
 

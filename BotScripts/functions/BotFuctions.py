@@ -1,6 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from BotScripts.create_bot import bot
-from wordgame.models import MatchList,GamersList,ChempionsList
+from wordgame.models import MatchList,GamersList,ChempionsList,EnglishDictionary
 import os
 import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'rest.settings')
@@ -44,9 +44,7 @@ def check_creator(user_id,user_name):
             return exists
     except (ObjectDoesNotExist,AttributeError):
         return exists,print(404)
-        
-def check_creator1(user_id,user_name):
-    pass
+    
 
 def create_game(chat_id,chat_name,user_id,user_name):
     data=MatchList(channel_name=chat_name,channel_ID=chat_id,players_count=+1)
@@ -56,19 +54,7 @@ def create_game(chat_id,chat_name,user_id,user_name):
     copy_data.save()
     creator=GamersList(user_id=user_id,user_name=user_name,match_ID=copy_data.match_ID)
     creator.save()
-    
-    
-
-
-    
         
-
-        
-
-def chat_info(chat_id,user_id):
-    data= bot.get_chat_member(chat_id=chat_id,user_id=user_id)
-    return data.id, data.title 
-
 
 def connect_gamers(user_id,user_name,match_ID):
     try:
@@ -92,14 +78,11 @@ def start_game():
         last_match.save()
         return print(last_match.start_game)
 
-def start_write():
-    last_match=MatchList.objects.last()
-    return last_match.start_game
     
 def finished():
     last_match=MatchList.objects.last()
     return last_match.finished
 
-
-
-
+def dictionary1():
+    word=EnglishDictionary.objects.all()
+    return word
