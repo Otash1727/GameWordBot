@@ -9,5 +9,5 @@ class Command(BaseCommand):
         with open('englishDictionary.csv') as cfile:
             reader = csv.reader(cfile)
             for row in reader:
-                upload=EnglishDictionary(dictionary=row[0])
+                upload=EnglishDictionary(dictionary=row)
                 upload.save()

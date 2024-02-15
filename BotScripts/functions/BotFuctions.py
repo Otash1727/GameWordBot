@@ -13,7 +13,8 @@ def game_boolen():
     start_or_not=False
     try:
         last_progress=MatchList.objects.last()
-        if last_progress.progress=='active'     :
+        data2=GamersList.objects.last()
+        if last_progress.progress=='active':
             if last_progress.start_game==False:
                 start_or_not=True
                 return start_or_not
@@ -34,6 +35,7 @@ def check_creator(user_id,user_name):
     exists=False
     try:
         data=MatchList.objects.last()
+       
         check_user=GamersList.objects.filter(match_ID=data.match_ID)
         if user_id in [i.user_id for i in check_user ]:
             exists=True
@@ -72,11 +74,16 @@ def show_players(match_id):
     data=GamersList.objects.filter(match_ID=match_id)   
     return data
 
-def start_game():
+def start_game1():
         last_match=MatchList.objects.last()
+        change_start=GamersList.objects.filter(match_ID=last_match.match_ID)
+        for i in change_start:
+            i.start_game=True
+            i.save()
         last_match.start_game=True
         last_match.save()
         return print(last_match.start_game)
+
 
     
 def finished():
@@ -86,3 +93,13 @@ def finished():
 def dictionary1():
     word=EnglishDictionary.objects.all()
     return word
+
+def game_info(callback):    
+    data=GamersList.objects.filter(user_id=callback).last()
+    return data 
+
+
+def off():
+    oddd=GamersList.objects.all()
+    oddd.delete()
+     

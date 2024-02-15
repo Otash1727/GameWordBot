@@ -34,6 +34,8 @@ class GamersList(models.Model):
     user_id=models.IntegerField()
     user_name=models.CharField(max_length=200)
     found_word_count=models.IntegerField(null=True,blank=True)
+    chance=models.IntegerField(default=3)
+    start_game=models.BooleanField(default=False)
     finished=models.BooleanField(default=False)
     created_at=models.DateTimeField(auto_now_add=True,db_index=True)
     Match_List=models.ForeignKey(to=MatchList,on_delete=models.CASCADE,null=True,blank=True)  

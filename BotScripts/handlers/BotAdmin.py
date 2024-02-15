@@ -2,6 +2,7 @@ from BotScripts.create_bot import bot,dp
 from aiogram import Router,F
 from aiogram.filters import Command
 from aiogram.types import Message,BotCommand,BotCommandScopeChat,InlineKeyboardButton,CallbackQuery
+from aiogram.enums import ParseMode
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.filters import BaseFilter
 from wordgame.models import GamersList,MatchList,ChempionsList
@@ -53,7 +54,10 @@ async def runbot(message:Message):
     await bot.send_message(chat_id=message.from_user.id,text='Hello send /help command to know what you can do with me')
     await bot.send_message(chat_id=message.from_user.id,text='The game is played only with an opponent and in a group.')
     await bot.set_my_commands([BotCommand(command='start',description='Run the bot'),BotCommand(command='help',description='If you want to know more about our bot, this command will help you')],BotCommandScopeChat(chat_id=message.from_user.id))
+ 
+            
 
+    
 
 @router.message(Command('help'))
 async def help(message:Message):
@@ -70,7 +74,15 @@ async def fff(message:Message):
     
     print(check_status.status)  
     if check_status.status=='administrator':
-        await bot.send_message(chat_id=chat_id,text="Great, get ready and click on start button below",reply_markup=join_kb.as_markup())        
+        last_id=BotFuctions.match_info()
+        show_player=BotFuctions.show_players(match_id=last_id.match_ID)    
+        if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False:
+            if message.text=='/new_match@GameWordEnglishbot':
+                print('davom et')
+                #ID=message.message_id
+                #await bot.edit_message_text(chat_id=chat_id,text='davom et' ,message_id=ID)
+        else:
+            await bot.send_message(chat_id=chat_id,text="Great, get ready and click on start button below",reply_markup=join_kb.as_markup())        
     else:
         await bot.send_message(chat_id=chat_id,text='You can play only with an opponent(s) and in a group.')
         await bot.send_message(chat_id=chat_id,text="You can play only with an opponent(or more) and in a group.")
@@ -81,10 +93,18 @@ async def join_game(callback:CallbackQuery):
     chat_id=callback.message.chat.id
     chat_info= await bot.get_chat(chat_id=chat_id)
     data=BotFuctions.game_boolen()
-    if data==False :
-        create=BotFuctions.create_game(chat_id=chat_id,chat_name=chat_info.title,user_id=callback.from_user.id,user_name=callback.from_user.full_name)
-        await callback.answer(text='You are create new game. Please wait for other to join!',show_alert=True)
-
+    if data==False:
+        try:
+            data2=BotFuctions.game_info(callback=callback.from_user.id)
+            print(data2.start_game,5656)
+            if data2.start_game==True and data2.finished==False:    
+                await callback.answer(text='You have an unfinished game\n Please finished the game 😡',show_alert=True)
+            else:
+                create=BotFuctions.create_game(chat_id=chat_id,chat_name=chat_info.title,user_id=callback.from_user.id,user_name=callback.from_user.full_name)
+                await callback.answer(text='You are create new game. Please wait for other to join!',show_alert=True)
+        except AttributeError:
+            create=BotFuctions.create_game(chat_id=chat_id,chat_name=chat_info.title,user_id=callback.from_user.id,user_name=callback.from_user.full_name)
+            await callback.answer(text='You are create new game. Please wait for other to join!',show_alert=True)
 
     else:
         creator=BotFuctions.check_creator(user_id=callback.from_user.id,user_name=callback.from_user.full_name)
@@ -109,47 +129,42 @@ async def join_game(callback:CallbackQuery):
 @router.callback_query(F.data=='start')
 async def start_game(callback:CallbackQuery):
     global episode
-    data=BotFuctions.start_game()
+    data=BotFuctions.start_game1()
+
     await callback.message.answer(text='You start the game',reply_to_message_id=message_id.message_id)
     await callback.message.answer('write word!')
    
     
 @router.message()
 async def empty_handler(message:Message):
-    words=[]
     chat_id=message.chat.id
     last_id=BotFuctions.match_info()
     show_player=BotFuctions.show_players(match_id=last_id.match_ID)    
     if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False: 
         print(45)
+        show_player=BotFuctions.show_players(match_id=last_id.match_ID)
+        print(len(show_player))    
+        data=BotFuctions.dictionary1()
+        word=False
+        for i in data:
+            if message.text in i.dictionary:
+                word=True
+                break
+            else:
+                pass
+        if word==True:
+            await bot.send_message(chat_id=chat_id,text=f"<b>{message.from_user.full_name}</b>, It is your turn. send a word for  <b>{message.text[-1].upper()}</b>",parse_mode=ParseMode.HTML)
+        else:
+            ID=message.message_id
+            await bot.send_message(chat_id=chat_id,reply_to_message_id=ID,text=f"I can't recognize <del>{message.text.upper()}</del> as a word",parse_mode=ParseMode.HTML)
+        
        
-        #if message.text in dictionary:
-        #    print('yes')
-        #else:
-        #    print('you make mistake')
     else:   
         print('oddiy rejim')
         await bot.set_my_commands([BotCommand(command='new_match',description='Star new match')],BotCommandScopeChat(chat_id=chat_id))
         last_id=BotFuctions.match_info()
-        show_player=BotFuctions.show_players(match_id=last_id.match_ID)
-        print([i.user_id for i in show_player])     
-        data=BotFuctions.dictionary1()
-        for i in data:
-            if message.text in i.dictionary:
-                print(1)
-                break
-                
-                
-            else:
-                print(0)
+        ########
         
-        #if any(message.text in i.dictionary for i in data):
-        #    print(5)
-        #else:
-        #    print('dalbayob')
-    
-    
-    
 
 
 
