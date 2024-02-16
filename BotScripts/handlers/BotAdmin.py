@@ -26,7 +26,7 @@ router=Router()
 chat_id=None
 
 #message_id
-message_id=None
+message_id1=[]
 
 
 
@@ -44,6 +44,9 @@ mix_kb.row(join).row(start)
 mix_kb2=InlineKeyboardBuilder()
 mix_kb2.row(start).row(end)
 
+End=InlineKeyboardBuilder()
+End.row(end)
+
 
 
 
@@ -54,7 +57,7 @@ async def runbot(message:Message):
     await bot.send_message(chat_id=message.from_user.id,text='Hello send /help command to know what you can do with me')
     await bot.send_message(chat_id=message.from_user.id,text='The game is played only with an opponent and in a group.')
     await bot.set_my_commands([BotCommand(command='start',description='Run the bot'),BotCommand(command='help',description='If you want to know more about our bot, this command will help you')],BotCommandScopeChat(chat_id=message.from_user.id))
- 
+    BotFuctions.off()
             
 
     
@@ -120,7 +123,10 @@ async def join_game(callback:CallbackQuery):
                 count=len(shown)
 
                 await callback.answer(text='You joined the game',show_alert=True)
-                message_id=await callback.message.answer(text=f"Match ID - {info.match_ID} \n Number of players - {count} \n Players -------",reply_markup=mix_kb.as_markup())
+                get_id=await callback.message.answer(text=f"Match ID - {info.match_ID} \n Number of players - {count} \n Players -------",
+                reply_markup=mix_kb.as_markup())
+                message_id1.append(get_id.message_id)
+                
         else:
             create=BotFuctions.create_game(chat_id=chat_id,chat_name=chat_info.title,user_id=callback.from_user.id,user_name=callback.from_user.full_name)
             await callback.answer(text='You are create new game. Please wait for other to join!',show_alert=True)
@@ -128,20 +134,25 @@ async def join_game(callback:CallbackQuery):
 
 @router.callback_query(F.data=='start')
 async def start_game(callback:CallbackQuery):
-    global episode
+    print(message_id1)
+    chat_id=callback.message.chat.id
     data=BotFuctions.start_game1()
-
-    await callback.message.answer(text='You start the game',reply_to_message_id=message_id.message_id)
+    info=BotFuctions.match_info()
+    shown=BotFuctions.show_players(info.match_ID)
+    count=len(shown)
+    await bot.edit_message_text(chat_id=chat_id,message_id=message_id1[0],text=f"Match ID - {info.match_ID} \n Number of players - {count} \n Players -------",reply_markup=End.as_markup())
+    await callback.message.answer(text=f'{callback.from_user.full_name} start the game',reply_to_message_id=message_id1[0])
     await callback.message.answer('write word!')
+    
    
     
 @router.message()
 async def empty_handler(message:Message):
     chat_id=message.chat.id
     last_id=BotFuctions.match_info()
-    show_player=BotFuctions.show_players(match_id=last_id.match_ID)    
+    show_player=BotFuctions.show_players(match_id=last_id.match_ID) 
+       
     if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False: 
-        print(45)
         show_player=BotFuctions.show_players(match_id=last_id.match_ID)
         print(len(show_player))    
         data=BotFuctions.dictionary1()
@@ -152,6 +163,7 @@ async def empty_handler(message:Message):
                 break
             else:
                 pass
+        # shu yerga yozilish kerak qolgan kodlar 
         if word==True:
             await bot.send_message(chat_id=chat_id,text=f"<b>{message.from_user.full_name}</b>, It is your turn. send a word for  <b>{message.text[-1].upper()}</b>",parse_mode=ParseMode.HTML)
         else:
