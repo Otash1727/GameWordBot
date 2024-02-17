@@ -90,7 +90,7 @@ def finished():
     last_match=MatchList.objects.last()
     return last_match.finished
 
-def dictionary1():
+def dictionary1(message):
     word=EnglishDictionary.objects.all()
     return word
 
@@ -102,4 +102,7 @@ def game_info(callback):
 def off():
     oddd=GamersList.objects.all()
     oddd.delete()
+    dd=EnglishDictionary.objects.all()
+    dd.delete()
+
      

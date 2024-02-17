@@ -8,6 +8,8 @@ from aiogram.filters import BaseFilter
 from wordgame.models import GamersList,MatchList,ChempionsList
 from BotScripts.functions import BotFuctions
 
+import csv
+csv.field_size_limit(1000000)
 
 
 
@@ -151,19 +153,25 @@ async def empty_handler(message:Message):
     chat_id=message.chat.id
     last_id=BotFuctions.match_info()
     show_player=BotFuctions.show_players(match_id=last_id.match_ID) 
-       
+    count=show_player.count()
+    print("O'tinchilar soni",count)
     if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False: 
         show_player=BotFuctions.show_players(match_id=last_id.match_ID)
+        for i in show_player:
+            print(i.user_id)
+           
+            
+
         print(len(show_player))    
-        data=BotFuctions.dictionary1()
         word=False
-        for i in data:
-            if message.text in i.dictionary:
-                word=True
-                break
-            else:
-                pass
-        # shu yerga yozilish kerak qolgan kodlar 
+        with open('englishDictionary.csv',mode='r') as de:
+            csvfile=csv.reader(de)
+            for i in csvfile:
+                if message.text.capitalize() in i and len(message.text)>1:
+                    word=True 
+                    break  
+                else:
+                    pass 
         if word==True:
             await bot.send_message(chat_id=chat_id,text=f"<b>{message.from_user.full_name}</b>, It is your turn. send a word for  <b>{message.text[-1].upper()}</b>",parse_mode=ParseMode.HTML)
         else:
@@ -176,8 +184,10 @@ async def empty_handler(message:Message):
         await bot.set_my_commands([BotCommand(command='new_match',description='Star new match')],BotCommandScopeChat(chat_id=chat_id))
         last_id=BotFuctions.match_info()
         ########
-        
-
+        dd=['ap','ss']
+        count=len(dd)
+        print(count)
+         
 
 
 
