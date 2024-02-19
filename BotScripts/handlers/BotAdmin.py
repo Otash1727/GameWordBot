@@ -80,10 +80,12 @@ async def fff(message:Message):
     print(check_status.status)  
     if check_status.status=='administrator':
         last_id=BotFuctions.match_info()
-        show_player=BotFuctions.show_players(match_id=last_id.match_ID)    
-        if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False:
-            if message.text=='/new_match@GameWordEnglishbot':
-                print('davom et')
+        print(last_id)
+        if last_id !=None:
+            show_player=BotFuctions.show_players(match_id=last_id.match_ID)    
+            if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False:
+                if message.text=='/new_match@GameWordEnglishbot':
+                    print('davom et')
                 #ID=message.message_id
                 #await bot.edit_message_text(chat_id=chat_id,text='davom et' ,message_id=ID)
         else:
@@ -123,7 +125,6 @@ async def join_game(callback:CallbackQuery):
                 info=BotFuctions.match_info()
                 shown=BotFuctions.show_players(info.match_ID)
                 count=len(shown)
-
                 await callback.answer(text='You joined the game',show_alert=True)
                 get_id=await callback.message.answer(text=f"Match ID - {info.match_ID} \n Number of players - {count} \n Players -------",
                 reply_markup=mix_kb.as_markup())
@@ -136,7 +137,7 @@ async def join_game(callback:CallbackQuery):
 
 @router.callback_query(F.data=='start')
 async def start_game(callback:CallbackQuery):
-    print(message_id1)
+    print(message_id1,'message_id')
     chat_id=callback.message.chat.id
     data=BotFuctions.start_game1()
     info=BotFuctions.match_info()
@@ -146,6 +147,7 @@ async def start_game(callback:CallbackQuery):
     await callback.message.answer(text=f'{callback.from_user.full_name} start the game',reply_to_message_id=message_id1[0])
     await callback.message.answer('write word!')
     
+    
    
     
 @router.message()
@@ -154,21 +156,16 @@ async def empty_handler(message:Message):
     last_id=BotFuctions.match_info()
     show_player=BotFuctions.show_players(match_id=last_id.match_ID) 
     count=show_player.count()
-    print("O'tinchilar soni",count)
+    print("O'yinchilar soni",count)
     if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False: 
-        show_player=BotFuctions.show_players(match_id=last_id.match_ID)
-        for i in show_player:
-            print(i.user_id)
-           
-            
-
-        print(len(show_player))    
+        show_player=BotFuctions.show_players(match_id=last_id.match_ID)    
         word=False
+        queue='next'
         with open('englishDictionary.csv',mode='r') as de:
             csvfile=csv.reader(de)
             for i in csvfile:
                 if message.text.capitalize() in i and len(message.text)>1:
-                    word=True 
+                    word=True  
                     break  
                 else:
                     pass 
@@ -184,9 +181,11 @@ async def empty_handler(message:Message):
         await bot.set_my_commands([BotCommand(command='new_match',description='Star new match')],BotCommandScopeChat(chat_id=chat_id))
         last_id=BotFuctions.match_info()
         ########
-        dd=['ap','ss']
-        count=len(dd)
-        print(count)
+                    
+        
+        
+        
+        
          
 
 

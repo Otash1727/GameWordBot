@@ -41,7 +41,9 @@ def check_creator(user_id,user_name):
             exists=True
             return  exists
         else:
-            fsm=(GamersList(user_id=user_id,user_name=user_name,match_ID=data.match_ID))
+            print('bu yerga')
+            last_queue=GamersList.objects.last()
+            fsm=(GamersList(user_id=user_id,user_name=user_name,match_ID=data.match_ID,queue=last_queue.queue+1))
             fsm.save()
             return exists
     except (ObjectDoesNotExist,AttributeError):
@@ -49,22 +51,13 @@ def check_creator(user_id,user_name):
     
 
 def create_game(chat_id,chat_name,user_id,user_name):
-    data=MatchList(channel_name=chat_name,channel_ID=chat_id,players_count=+1)
+    data=MatchList(channel_name=chat_name,channel_ID=chat_id)
     data.save()
     copy_data=MatchList.objects.last()
     copy_data.progress='active'
     copy_data.save()
     creator=GamersList(user_id=user_id,user_name=user_name,match_ID=copy_data.match_ID)
     creator.save()
-        
-
-def connect_gamers(user_id,user_name,match_ID):
-    try:
-        data1=GamersList.objects.get(user_id=user_id,match_ID=match_ID)
-        return data1
-    except ObjectDoesNotExist:
-        fsm=(GamersList(user_id=user_id,user_name=user_name,match_ID=match_ID))
-        fsm.save()
 
 def match_info():
     last_match=MatchList.objects.last()
@@ -102,7 +95,7 @@ def game_info(callback):
 def off():
     oddd=GamersList.objects.all()
     oddd.delete()
-    dd=EnglishDictionary.objects.all()
+    dd=MatchList.objects.all()
     dd.delete()
 
      
