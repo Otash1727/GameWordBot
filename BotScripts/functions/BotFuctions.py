@@ -77,8 +77,16 @@ def start_game1():
         last_match.save()
         return print(last_match.start_game)
 
+def first_queue():
+    queue=GamersList.objects.filter(queue=1)
+    for i in queue:
+        return i.user_id,i.user_name
 
-    
+def get_queue(match_id,user_id):
+    queue=GamersList.objects.filter(match_ID=match_id,user_id=user_id)
+    for i in queue:
+        return i.queue    
+
 def finished():
     last_match=MatchList.objects.last()
     return last_match.finished

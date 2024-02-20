@@ -29,6 +29,8 @@ chat_id=None
 
 #message_id
 message_id1=[]
+#in_turn
+
 
 
 
@@ -144,9 +146,9 @@ async def start_game(callback:CallbackQuery):
     shown=BotFuctions.show_players(info.match_ID)
     count=len(shown)
     await bot.edit_message_text(chat_id=chat_id,message_id=message_id1[0],text=f"Match ID - {info.match_ID} \n Number of players - {count} \n Players -------",reply_markup=End.as_markup())
-    await callback.message.answer(text=f'{callback.from_user.full_name} start the game',reply_to_message_id=message_id1[0])
-    await callback.message.answer('write word!')
-    
+    reply=await callback.message.answer(text=f'{callback.from_user.full_name} start the game',reply_to_message_id=message_id1[0])
+    queue=BotFuctions.first_queue()
+    await bot.send_message(chat_id=chat_id,text=f'<b><i>{queue[1]}</i></b> must write an English word',reply_to_message_id=reply.message_id,parse_mode=ParseMode.HTML)
     
    
     
@@ -157,31 +159,35 @@ async def empty_handler(message:Message):
     show_player=BotFuctions.show_players(match_id=last_id.match_ID) 
     count=show_player.count()
     print("O'yinchilar soni",count)
-    if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False: 
-        show_player=BotFuctions.show_players(match_id=last_id.match_ID)    
-        word=False
-        queue='next'
-        with open('englishDictionary.csv',mode='r') as de:
-            csvfile=csv.reader(de)
-            for i in csvfile:
-                if message.text.capitalize() in i and len(message.text)>1:
-                    word=True  
-                    break  
-                else:
-                    pass 
-        if word==True:
-            await bot.send_message(chat_id=chat_id,text=f"<b>{message.from_user.full_name}</b>, It is your turn. send a word for  <b>{message.text[-1].upper()}</b>",parse_mode=ParseMode.HTML)
-        else:
-            ID=message.message_id
-            await bot.send_message(chat_id=chat_id,reply_to_message_id=ID,text=f"I can't recognize <del>{message.text.upper()}</del> as a word",parse_mode=ParseMode.HTML)
-        
-       
+    #queue users
+    data=BotFuctions.get_queue(match_id=last_id.match_ID,user_id=message.from_user.id)
+    print(data,'navbat')
+    print(in_turn,"o'zgarish boldimi")
+    if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False and in_turn==data:            
+            word=False
+            with open('englishDictionary.csv',mode='r') as de:
+                csvfile=csv.reader(de)
+                for i in csvfile:
+                    if message.text.capitalize() in i and len(message.text)>1:
+                        word=True 
+                        break  
+                    else:
+                        pass 
+            if word==True:
+                await bot.send_message(chat_id=chat_id,text=f"<b>{message.from_user.full_name}</b>, It is your turn. send a word for  <b>{message.text[-1].upper()}</b>",parse_mode=ParseMode.HTML)
+                in_turn+=1
+                print(in_turn,'keyingi navbat')
+            else:
+                ID=message.message_id
+                await bot.send_message(chat_id=chat_id,reply_to_message_id=ID,text=f"I can't recognize <del>{message.text.upper()}</del> as a word",parse_mode=ParseMode.HTML)           
+    elif message.from_user.id in [i.user_id  for i in show_player]:
+        await bot.send_message(chat_id=chat_id,text=f"Sorry {message.from_user.full_name},it's not your turn\nPlease wait\nit's your turn-{data}")
     else:   
         print('oddiy rejim')
         await bot.set_my_commands([BotCommand(command='new_match',description='Star new match')],BotCommandScopeChat(chat_id=chat_id))
         last_id=BotFuctions.match_info()
         ########
-                    
+                        
         
         
         
