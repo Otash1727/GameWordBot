@@ -85,7 +85,24 @@ def first_queue():
 def get_queue(match_id,user_id):
     queue=GamersList.objects.filter(match_ID=match_id,user_id=user_id)
     for i in queue:
-        return i.queue    
+        return i.queue  
+         
+def count_queue(match_id):
+    last_match=MatchList.objects.filter(match_ID=match_id)
+    for i in last_match:
+        i.queue+=1
+        i.save()
+
+def delete_queue(match_id):
+    last_match=MatchList.objects.filter(match_ID=match_id)
+    for i in last_match:
+        i.queue=1
+        i.save()
+
+def name_queue(match_id,queue):
+    data=GamersList.objects.filter(match_ID=match_id,queue=queue)
+    for i in data:
+        return i.user_name
 
 def finished():
     last_match=MatchList.objects.last()

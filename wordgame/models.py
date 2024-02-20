@@ -12,6 +12,7 @@ class MatchList(models.Model):
     match_ID=models.AutoField(primary_key=True)
     players_count=models.IntegerField(null=True,blank=True)
     word_count=models.IntegerField(null=True,blank=True)
+    queue=models.PositiveIntegerField(default=1)
     start_game=models.BooleanField(default=False)
     finished=models.BooleanField(default=False)
     progress=models.CharField(max_length=20,default='no active')
@@ -19,7 +20,7 @@ class MatchList(models.Model):
     DisplyFields=['match_ID','channel_name','channel_ID','start_game']
     SearchFilds=['channel_ID','channel_name','match_ID','players_count','word_count']
     FiltersFields=['channel_name']
-    
+        
         
 class EnglishDictionary(models.Model):    
     dictionary=models.CharField(max_length=300)

@@ -161,22 +161,28 @@ async def empty_handler(message:Message):
     print("O'yinchilar soni",count)
     #queue users
     data=BotFuctions.get_queue(match_id=last_id.match_ID,user_id=message.from_user.id)
-    print(data,'navbat')
-    print(in_turn,"o'zgarish boldimi")
-    if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False and in_turn==data:            
+    print(last_id.queue,data,'equals')
+    if message.from_user.id in [i.user_id  for i in show_player] and last_id.start_game==True and last_id.finished==False and last_id.queue==data:            
             word=False
             with open('englishDictionary.csv',mode='r') as de:
                 csvfile=csv.reader(de)
                 for i in csvfile:
                     if message.text.capitalize() in i and len(message.text)>1:
-                        word=True 
+                        word=True
+                        BotFuctions.count_queue(match_id=last_id.match_ID)
+                        if last_id.queue==count:
+                            print(last_id.queue,'equals')
+                            BotFuctions.delete_queue(match_id=last_id.match_ID)
                         break  
                     else:
                         pass 
             if word==True:
-                await bot.send_message(chat_id=chat_id,text=f"<b>{message.from_user.full_name}</b>, It is your turn. send a word for  <b>{message.text[-1].upper()}</b>",parse_mode=ParseMode.HTML)
-                in_turn+=1
-                print(in_turn,'keyingi navbat')
+                get_name=BotFuctions.name_queue(match_id=last_id.match_ID,queue=data)
+                print(get_name)
+                await bot.send_message(chat_id=chat_id,text=f"<b>{get_name}</b>, It is your turn. send a word for  <b>{message.text[-1].upper()}</b>",parse_mode=ParseMode.HTML)
+                
+                print('keyingi navbat')
+                print(get_name)
             else:
                 ID=message.message_id
                 await bot.send_message(chat_id=chat_id,reply_to_message_id=ID,text=f"I can't recognize <del>{message.text.upper()}</del> as a word",parse_mode=ParseMode.HTML)           
