@@ -61,13 +61,40 @@ def create_game(chat_id,chat_name,user_id,user_name):
 def connect_user(user_id,user_name):
     data=MatchList.objects.get(start_game=False)
     data2=GamersList.objects.last()
-    fsm=GamersList(user_id=user_id,user_name=user_name,match_ID=data.match_ID,queue=data2.queue+1)
+    fsm=GamersList(user_id=user_id,user_name=user_name,match_ID=data.match_ID,queue=data2.queue+1,progress='active')
     fsm.save()
+    data.players_count+=1
+    data.save()
 
-def check_creator(user_id):
-    pass
+def show_match():
+    data=MatchList.objects.get(start_game=False)
+    return data
 
-    
+def show_user():
+    data=MatchList.objects.get(start_game=False)
+    data2=GamersList.objects.filter(match_ID=data.match_ID)
+    return data2
+
+def send_msg():
+    data=MatchList.objects.get(start_game=False)
+    data2=GamersList.objects.filter(match_ID=data.match_ID,send_msg=False)  
+    return data2
+
+def send_msg_booln():
+    data=MatchList.objects.get(start_game=False)
+    data2=GamersList.objects.filter(match_ID=data.match_ID)
+    for i in data2:
+        i.send_msg=True
+        i.save()
+
+def msg_id(send_id):
+    data=MatchList.objects.get(start_game=False)
+    if data.send_msg_id!=None:
+        data.send_msg_id=f"{data.send_msg_id} , {str(send_id)}"
+        data.save()
+    else:
+        data.send_msg_id=send_id
+        data.save()
 
 
 

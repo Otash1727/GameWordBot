@@ -10,12 +10,13 @@ class MatchList(models.Model):
     channel_name=models.CharField(max_length=200)   
     channel_ID=models.IntegerField()  
     match_ID=models.AutoField(primary_key=True)
-    players_count=models.IntegerField(null=True,blank=True)
+    players_count=models.IntegerField(null=True,blank=True,default=1)
     word_count=models.IntegerField(null=True,blank=True)
     queue=models.PositiveIntegerField(default=1)
     start_game=models.BooleanField(default=False)
     finished=models.BooleanField(default=False)
     progress=models.CharField(max_length=20,default='no active')
+    send_msg_id=models.CharField(null=True,blank=True,max_length=300)
     created_at=models.DateTimeField(auto_now_add=True,db_index=True)
     DisplyFields=['match_ID','channel_name','channel_ID','start_game']
     SearchFilds=['channel_ID','channel_name','match_ID','players_count','word_count']
@@ -40,6 +41,7 @@ class GamersList(models.Model):
     start_game=models.BooleanField(default=False)
     finished=models.BooleanField(default=False)
     progress=models.CharField(default='no active', max_length=15,null=True,blank=True)
+    send_msg=models.BooleanField(default=False)
     created_at=models.DateTimeField(auto_now_add=True,db_index=True)
     Match_List=models.ForeignKey(to=MatchList,on_delete=models.CASCADE,null=True,blank=True)  
     DisplayFields=['match_ID','user_name']

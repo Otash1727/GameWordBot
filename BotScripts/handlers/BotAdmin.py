@@ -8,7 +8,7 @@ from aiogram.filters import BaseFilter
 from wordgame.models import GamersList,MatchList,ChempionsList
 from BotScripts.functions import BotFuctions
 
-import csv
+import csv,json,re
 csv.field_size_limit(1000000)
 
 
@@ -28,7 +28,6 @@ router=Router()
 chat_id=None
 
 #message_id
-message_id1=[]
 #in_turn
 
 
@@ -41,6 +40,9 @@ end=(InlineKeyboardButton(text='end',callback_data='end'))
 
 join_kb=InlineKeyboardBuilder()
 join_kb.row(join)
+
+start_kb=InlineKeyboardBuilder()
+start_kb.row(start)
 
 mix_kb=InlineKeyboardBuilder()
 mix_kb.row(join).row(start)
@@ -114,11 +116,26 @@ async def  created_game(callback:CallbackQuery):
             if start_match==False:
                 connect_user=BotFuctions.connect_user(user_id=callback.from_user.id,user_name=callback.from_user.full_name)
                 print('sen oyinga qo\'shilding')
+                show_match=BotFuctions.show_match()
+                show_user=BotFuctions.show_user()
+                await callback.answer(text='You joined the game',show_alert=True)
+                we=['sss','sss']
+                get_id=await callback.message.answer(text=f"Match ID - {show_match.match_ID} \n Number of players - {show_match.players_count} \n 
+                Players \n{re.sub(r',',r'\n',string=we)}",reply_markup=join_kb.as_markup())
+                send_msg=BotFuctions.send_msg()
+                for i in send_msg:
+                    M_id=await bot.send_message(chat_id=i.user_id,text=f'<b>Match ID {show_match.match_ID}</b>\n<i>If you want to start the game. Please click 👇 the button</i>',reply_markup=start_kb.as_markup(),parse_mode=ParseMode.HTML)
+                    BotFuctions.send_msg_booln()
+                BotFuctions.msg_id(send_id=json.dumps(M_id.message_id))
             else:
                 create_game=BotFuctions.create_game(chat_id=chat_id,chat_name=chat_info.title,user_id=callback.from_user.id,user_name=callback.from_user.full_name)
                 print('oyin tashkil qilindi')
+                await callback.answer(text='You are create new game. Please wait for other to join!',show_alert=True)
         else:
-            await bot.send_message(chat_id=chat_id,text='Senda yakunlanamgan o\'yin bor ')
+            await callback.answer(text='🫵 have an unfinished game\n Please finished the game 😡',show_alert=True)
     else:
         create_game=BotFuctions.create_game(chat_id=chat_id,chat_name=chat_info.title,user_id=callback.from_user.id,user_name=callback.from_user.full_name)
         print('oyin tashkil qilindi')
+        await callback.answer(text='You are create new game. Please wait for other to join!',show_alert=True)
+
+
