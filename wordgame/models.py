@@ -39,6 +39,7 @@ class GamersList(models.Model):
     queue=models.PositiveIntegerField(default=1)  
     start_game=models.BooleanField(default=False)
     finished=models.BooleanField(default=False)
+    progress=models.CharField(default='no active', max_length=15,null=True,blank=True)
     created_at=models.DateTimeField(auto_now_add=True,db_index=True)
     Match_List=models.ForeignKey(to=MatchList,on_delete=models.CASCADE,null=True,blank=True)  
     DisplayFields=['match_ID','user_name']

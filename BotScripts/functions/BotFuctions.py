@@ -8,113 +8,72 @@ os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 django.setup()
 
 
-
-def game_boolen():
-    start_or_not=False
-    try:
-        last_progress=MatchList.objects.last()
-        data2=GamersList.objects.last()
-        if last_progress.progress=='active':
-            if last_progress.start_game==False:
-                start_or_not=True
-                return start_or_not
-            else:
-                
-                return start_or_not 
-        else:
-            if last_progress.start_game==False:
-                return start_or_not      
-            else:
-                start_or_not=True
-                return start_or_not 
-    except AttributeError:
-        return start_or_not     
-
- 
-def check_creator(user_id,user_name):
+def exists_game():
     exists=False
     try:
-        data=MatchList.objects.last()
-       
-        check_user=GamersList.objects.filter(match_ID=data.match_ID)
-        if user_id in [i.user_id for i in check_user ]:
+        data=MatchList.objects.all()
+        for i in data:
+            pass
+        if i !=None:
             exists=True
-            return  exists
-        else:
-            print('bu yerga')
-            last_queue=GamersList.objects.last()
-            fsm=(GamersList(user_id=user_id,user_name=user_name,match_ID=data.match_ID,queue=last_queue.queue+1))
-            fsm.save()
             return exists
-    except (ObjectDoesNotExist,AttributeError):
-        return exists,print(404)
+    except (UnboundLocalError,ObjectDoesNotExist):
+        return exists
+
+def exists_user(user_id):
+    exists='no active'
+    try:
+        data=GamersList.objects.get(user_id=user_id,progress='active')
+        exists='active' 
+        return exists
+    except (AttributeError,ObjectDoesNotExist,UnboundLocalError):
+        return exists
+    
+def connect_user1(user_id):
+    connect=False
+    try:
+        data=GamersList.objects.get(user_id=user_id,progress='active')
+        data2=MatchList.objects.get(match_ID=data.match_ID,finished=False)
+        if data2!=None:
+            connect
+    except:
+        pass
     
 
+
+def get_user(user_id):
+    data=GamersList.objects.get(user_id=user_id)
+    return data.progress
+
+def start_match():
+    data=MatchList.objects.last()
+    return data.start_game
+    
 def create_game(chat_id,chat_name,user_id,user_name):
     data=MatchList(channel_name=chat_name,channel_ID=chat_id)
     data.save()
     copy_data=MatchList.objects.last()
     copy_data.progress='active'
     copy_data.save()
-    creator=GamersList(user_id=user_id,user_name=user_name,match_ID=copy_data.match_ID)
+    creator=GamersList(user_id=user_id,user_name=user_name,match_ID=data.match_ID,progress='active')
     creator.save()
 
-def match_info():
-    last_match=MatchList.objects.last()
-    return last_match
+def connect_user(user_id,user_name):
+    data=MatchList.objects.get(start_game=False)
+    data2=GamersList.objects.last()
+    fsm=GamersList(user_id=user_id,user_name=user_name,match_ID=data.match_ID,queue=data2.queue+1)
+    fsm.save()
 
-def show_players(match_id):
-    data=GamersList.objects.filter(match_ID=match_id)   
-    return data
+def check_creator(user_id):
+    pass
 
-def start_game1():
-        last_match=MatchList.objects.last()
-        change_start=GamersList.objects.filter(match_ID=last_match.match_ID)
-        for i in change_start:
-            i.start_game=True
-            i.save()
-        last_match.start_game=True
-        last_match.save()
-        return print(last_match.start_game)
+    
 
-def first_queue():
-    queue=GamersList.objects.filter(queue=1)
-    for i in queue:
-        return i.user_id,i.user_name
 
-def get_queue(match_id,user_id):
-    queue=GamersList.objects.filter(match_ID=match_id,user_id=user_id)
-    for i in queue:
-        return i.queue  
-         
-def count_queue(match_id):
-    last_match=MatchList.objects.filter(match_ID=match_id)
-    for i in last_match:
-        i.queue+=1
-        i.save()
 
-def delete_queue(match_id):
-    last_match=MatchList.objects.filter(match_ID=match_id)
-    for i in last_match:
-        i.queue=1
-        i.save()
 
-def name_queue(match_id,queue):
-    data=GamersList.objects.filter(match_ID=match_id,queue=queue)
-    for i in data:
-        return i.user_name
 
-def finished():
-    last_match=MatchList.objects.last()
-    return last_match.finished
 
-def dictionary1(message):
-    word=EnglishDictionary.objects.all()
-    return word
-
-def game_info(callback):    
-    data=GamersList.objects.filter(user_id=callback).last()
-    return data 
 
 
 def off():
@@ -123,4 +82,3 @@ def off():
     dd=MatchList.objects.all()
     dd.delete()
 
-     
