@@ -66,6 +66,21 @@ def connect_user(user_id,user_name):
     data.players_count+=1
     data.save()
 
+def check_players_count():
+    data=MatchList.objects.get(start_game=False)
+    return data.players_count
+
+def change_game_status():
+    data=MatchList.objects.last()
+    data.start_game=True
+    data.save()
+    data2=GamersList.objects.filter(match_ID=data.match_ID)
+    for i in data2:
+        i.start_game=True
+        i.save()
+        return i.user_id
+
+
 def show_match():
     data=MatchList.objects.get(start_game=False)
     return data
@@ -74,7 +89,31 @@ def show_user():
     data=MatchList.objects.get(start_game=False)
     data2=GamersList.objects.filter(match_ID=data.match_ID)
     return data2
+# compare player count
 
+def count_update():
+    data=MatchList.objects.get(start_game=False)
+    return data.players_count
+    
+
+# function gameinfo_msg_id from Matchlist
+def gameinfo_msg_bool():
+    data=MatchList.objects.get(start_game=False)
+    if data.players_count<=2:
+        return True
+    else:
+        return False
+
+def gameinfo_msg():
+    data=MatchList.objects.get(start_game=False)
+    return data.gameinfo_msg_id
+
+
+def gameinfo_msg_id():
+    data=MatchList.objects.get(start_game=False)
+    return data.gameinfo_msg_id
+
+# function send_msg_id from matchlist
 def send_msg():
     data=MatchList.objects.get(start_game=False)
     data2=GamersList.objects.filter(match_ID=data.match_ID,send_msg=False)  
@@ -89,16 +128,85 @@ def send_msg_booln():
 
 def msg_id(send_id):
     data=MatchList.objects.get(start_game=False)
-    if data.send_msg_id!=None:
-        data.send_msg_id=f"{data.send_msg_id} , {str(send_id)}"
+    data.send_msg_id=send_id
+    data.save()
+
+def get_msg():
+    data=MatchList.objects.get(start_game=False)
+    return data.send_msg_id
+
+def get_user():
+    data=GamersList.objects.get(progress='active')
+    data2=GamersList.objects.filter(match_ID=data.match_ID)
+    return data2
+
+# start function
+def start():
+    data=MatchList.objects.get(start_game=False)
+    data2=GamersList.objects.filter(match_ID=data.match_ID)
+    for i in data2:
+        i.start_game=True
+        i.save()
+        data.start_game=True
+        data.save()
+
+def first_queue():
+    data=MatchList.objects.get(start_game=False)
+    queue=GamersList.objects.filter(match_ID=data.match_ID,queue=1)
+    for i in queue:
+        return i.user_id,i.user_name
+
+# game functions
+    
+def current_game(user_id):
+    data=GamersList.objects.filter(progress='active',user_id=user_id)
+    return data
+
+def current_id(user_id):
+    data=GamersList.objects.filter(progress='active',user_id=user_id)
+    for i in data:
+        pass
+    data2=MatchList.objects.get(match_ID=i.match_ID)
+    return data2.queue,i.queue,i.chance,i.match_ID
+
+def count_queue(match_id):
+    last_match=MatchList.objects.filter(match_ID=match_id)
+    for i in last_match:
+        i.queue+=1
+        i.save()
+
+def current_queue(match_id):
+    data=MatchList.objects.get(match_ID=match_id)
+    return data.queue
+
+def show_player(match_id):
+    data=GamersList.objects.filter(match_ID=match_id)
+    return data
+
+def update_queue(match_id):
+    data=MatchList.objects.get(match_ID=match_id)
+    data.queue=1
+    data.save()
+
+def next_queue(match_id):
+    data=MatchList.objects.get(match_ID=match_id)
+    data2=GamersList.objects.get(queue=data.queue)
+    return data2
+
+def last_word_save(match_id,last_letter,text):
+    data=MatchList.objects.get(match_ID=match_id)
+    data.last_latter=last_letter
+    data.save()
+    if data.founded_word!=None:
+        data.founded_word=data.founded_word+text
         data.save()
     else:
-        data.send_msg_id=send_id
+        data.founded_word=text
         data.save()
 
-
-
-
+def chance_count(match_id,user_id):
+    data=GamersList.objects.get(user_id=user_id,match_ID=match_id)
+    
 
 
 

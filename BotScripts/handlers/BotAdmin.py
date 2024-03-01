@@ -44,6 +44,9 @@ join_kb.row(join)
 start_kb=InlineKeyboardBuilder()
 start_kb.row(start)
 
+end_kb=InlineKeyboardBuilder()
+end_kb.row(end)
+
 mix_kb=InlineKeyboardBuilder()
 mix_kb.row(join).row(start)
 
@@ -88,7 +91,8 @@ async def fff(message:Message):
         if exists_game==True:
             exists_user=BotFuctions.exists_user(user_id=message.from_user.id)
             if exists_user=='active':
-                await bot.send_message(chat_id=chat_id,text='ishlamiyman')
+                print('ishlamiyman')
+                pass
             else:
                 print(exists_user,'gege')
                 await bot.send_message(chat_id=chat_id,text="Great, get ready and click on start button below",reply_markup=join_kb.as_markup())
@@ -114,19 +118,27 @@ async def  created_game(callback:CallbackQuery):
         if exists_user=='no active':
             start_match=BotFuctions.start_match()
             if start_match==False:
-                connect_user=BotFuctions.connect_user(user_id=callback.from_user.id,user_name=callback.from_user.full_name)
-                print('sen oyinga qo\'shilding')
-                show_match=BotFuctions.show_match()
-                show_user=BotFuctions.show_user()
-                await callback.answer(text='You joined the game',show_alert=True)
-                we=['sss','sss']
-                get_id=await callback.message.answer(text=f"Match ID - {show_match.match_ID} \n Number of players - {show_match.players_count} \n 
-                Players \n{re.sub(r',',r'\n',string=we)}",reply_markup=join_kb.as_markup())
-                send_msg=BotFuctions.send_msg()
-                for i in send_msg:
-                    M_id=await bot.send_message(chat_id=i.user_id,text=f'<b>Match ID {show_match.match_ID}</b>\n<i>If you want to start the game. Please click 👇 the button</i>',reply_markup=start_kb.as_markup(),parse_mode=ParseMode.HTML)
-                    BotFuctions.send_msg_booln()
-                BotFuctions.msg_id(send_id=json.dumps(M_id.message_id))
+                players_count=BotFuctions.check_players_count()
+                if players_count+1<6:
+                    connect_user=BotFuctions.connect_user(user_id=callback.from_user.id,user_name=callback.from_user.full_name)
+                    print('sen oyinga qo\'shilding')
+                    count_update=BotFuctions.count_update()
+                    get_msg=BotFuctions.get_msg()
+                    show_match=BotFuctions.show_match()
+                    if get_msg!=None:
+                        print('deleted message')
+                        await bot.delete_message(chat_id=chat_id,message_id=get_msg)
+                        await callback.answer(text='You joined the game',show_alert=True)
+                        M_id=await callback.message.answer(text=f"Match ID - {show_match.match_ID} \n Number of players - {show_match.players_count} \n Players \n _____",reply_markup=mix_kb.as_markup())              
+                        BotFuctions.msg_id(send_id=M_id.message_id)
+                    else:
+                        await callback.answer(text='You joined the game',show_alert=True)
+                        M_id=await callback.message.answer(text=f"Match ID - {show_match.match_ID} \n Number of players - {show_match.players_count} \n Players \n _____",reply_markup=mix_kb.as_markup())              
+                        BotFuctions.msg_id(send_id=M_id.message_id)
+                else:
+                    change_game_status=BotFuctions.change_game_status()
+                    create_game=BotFuctions.create_game(chat_id=chat_id,chat_name=chat_info.title,user_id=callback.from_user.id,user_name=callback.from_user.full_name)
+                   
             else:
                 create_game=BotFuctions.create_game(chat_id=chat_id,chat_name=chat_info.title,user_id=callback.from_user.id,user_name=callback.from_user.full_name)
                 print('oyin tashkil qilindi')
@@ -138,4 +150,73 @@ async def  created_game(callback:CallbackQuery):
         print('oyin tashkil qilindi')
         await callback.answer(text='You are create new game. Please wait for other to join!',show_alert=True)
 
+@router.callback_query(F.data=='start')
+async def  match_start(callback:CallbackQuery):
+    chat_id=callback.message.chat.id
+    get_msg=BotFuctions.get_msg()
+    show_match=BotFuctions.show_match()
+    await bot.edit_message_text(chat_id=chat_id,message_id=get_msg,text=f"<b>Match ID</b> - <i>{show_match.match_ID}</i> \n <b>Number of players</b> - <i>{show_match.players_count}</i> \n <b>Players</b> \n<b>dsdsd</b>\n<b>✅✅ The game started✅✅</b>",parse_mode=ParseMode.HTML)
+    first_queue=BotFuctions.first_queue()
+    info_user=await bot.get_chat(chat_id=first_queue[0])
+    if info_user.username==None:
+        await bot.send_message(chat_id=chat_id,text=f'<b>{first_queue[1]}</b> must write an English word',parse_mode=ParseMode.HTML)
+    else:
+        await bot.send_message(chat_id=chat_id,text=f'<b>{first_queue[1]}</b> must write an English word\n@{info_user.username}',parse_mode=ParseMode.HTML)
+    BotFuctions.start()
 
+@router.callback_query(F.data=='end')
+async def end_game(callback:CallbackQuery):
+    pass
+
+@router.message()
+async def empty_handler(message:Message):
+    chat_id=message.chat.id
+    check_status=await bot.get_chat_member(chat_id=chat_id,user_id=bot.id)
+    if check_status.status=='administrator':
+        print('inside chat')
+        current_game=BotFuctions.current_game(user_id=message.from_user.id)
+        if len(current_game)!=0:
+            print('inside game')
+            current_id=BotFuctions.current_id(user_id=message.from_user.id)
+            if current_id[0]==current_id[1] and current_id[2]!=0:
+                next_level=False
+                Dictionary=open('englishDictionary.csv',mode='r') 
+                csvfile=csv.reader(Dictionary)
+                for i in csvfile:
+                    if str(message.text).capitalize() in i and len(message.text)>1:
+                        current_queue=BotFuctions.current_queue(match_id=current_id[3])
+                        show_player=BotFuctions.show_player(match_id=current_id[3])
+                        if current_queue==show_player.count():
+                            BotFuctions.update_queue(match_id=current_id[3])
+                        else:    
+                            BotFuctions.count_queue(match_id=current_id[3])
+                        BotFuctions.last_word_save(match_id=current_id[3],last_letter=str(message.text[-1]),text=json.dumps(message.text))
+                        next_level=True
+                        print(1727)
+                        break
+                    else:
+                        pass
+                if next_level==True:
+                    print('Togri javob')
+
+                else:
+                    print('xato qilding')
+            else:
+                if current_id[2]==0:
+                    print('you lose')
+                else:
+                    print('seni navbating emas')
+                    next_queue=BotFuctions.next_queue(match_id=current_id[3])
+                    info_user= await bot.get_chat(chat_id=next_queue.user_id)
+                    if info_user.username!=None:
+                        await bot.send_message(chat_id=chat_id,text=f"<b>Sorry</b> - <i>{message.from_user.full_name}</i>\n<b>It's not 🫵 turn</b>\n<b>Please wait❗️</b>\n<b>It's 🫵 turn</b> - <i>{current_id[1]}</i>\n<b>Now it is</b> <i>{next_queue.user_name}'s</i> <b>turn</b>\n@{info_user.username}",parse_mode=ParseMode.HTML)
+                    else:
+                        await bot.send_message(chat_id=chat_id,text=f"<b>Sorry</b> - <i>{message.from_user.full_name}</i>\n<b>It's not 🫵 turn</b>\n<b>Please wait❗️</b>\n<b>It's 🫵 turn</b> - <i>{current_id[1]}</i>\n<b>Now it is</b> <i>{next_queue.user_name}'s</i> <b>turn</b>",parse_mode=ParseMode.HTML)
+
+
+        else:
+            pass
+        
+
+    else:
+        print('oddiy rejim')
