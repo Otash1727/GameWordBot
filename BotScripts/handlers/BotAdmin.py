@@ -119,6 +119,7 @@ async def  created_game(callback:CallbackQuery):
             start_match=BotFuctions.start_match()
             if start_match==False:
                 players_count=BotFuctions.check_players_count()
+<<<<<<< HEAD
                 if players_count+1<6:
                     connect_user=BotFuctions.connect_user(user_id=callback.from_user.id,user_name=callback.from_user.full_name)
                     print('sen oyinga qo\'shilding')
@@ -136,6 +137,28 @@ async def  created_game(callback:CallbackQuery):
                         M_id=await callback.message.answer(text=f"Match ID - {show_match.match_ID} \n Number of players - {show_match.players_count} \n Players \n _____",reply_markup=mix_kb.as_markup())              
                         BotFuctions.msg_id(send_id=M_id.message_id)
                 else:
+=======
+                if players_count+1 <6:
+                    connect_user=BotFuctions.connect_user(user_id=callback.from_user.id,user_name=callback.from_user.full_name)
+                    print('sen oyinga qo\'shilding')
+                    show_match=BotFuctions.show_match()
+                    show_user=BotFuctions.show_user()
+                    await callback.answer(text='You joined the game',show_alert=True)
+                    get_msg_id=await callback.message.answer(text=f"Match ID - {show_match.match_ID} \n Number of players - {show_match.players_count} \n Players \n _____",reply_markup=join_kb.as_markup())
+                    BotFuctions.gameinfo_msg()
+                    send_msg=BotFuctions.send_msg()
+                    for i in send_msg:
+                        M_id=await bot.send_message(chat_id=i.user_id,text=f'<b>Match ID {show_match.match_ID}</b>\n<i>If you want to start the game. Please click 👇 the button 👇</i>',reply_markup=start_kb.as_markup(),parse_mode=ParseMode.HTML)
+                        BotFuctions.send_msg_booln()
+                    BotFuctions.msg_id(send_id=json.dumps(M_id.message_id))
+                else:
+                    get_msg_id=BotFuctions.get_msg_id()
+                    show_user=BotFuctions.show_user()
+                    print('oyin tashkil qilindi')
+                    await callback.answer(text='You are create new game. Please wait for other to join!',show_alert=True)
+                    for i,i2 in zip(show_user,get_msg_id.split(',')):
+                        await bot.edit_message_text(chat_id=i.user_id,message_id=int(i2),text='If 🫵 want to finish the game.Click  👇👇the button👇👇',reply_markup=end_kb.as_markup())
+>>>>>>> cc2a360813dbeaecee55531344401fe2ccc62cbf
                     change_game_status=BotFuctions.change_game_status()
                     create_game=BotFuctions.create_game(chat_id=chat_id,chat_name=chat_info.title,user_id=callback.from_user.id,user_name=callback.from_user.full_name)
                    
@@ -153,6 +176,7 @@ async def  created_game(callback:CallbackQuery):
 @router.callback_query(F.data=='start')
 async def  match_start(callback:CallbackQuery):
     chat_id=callback.message.chat.id
+<<<<<<< HEAD
     get_msg=BotFuctions.get_msg()
     show_match=BotFuctions.show_match()
     await bot.edit_message_text(chat_id=chat_id,message_id=get_msg,text=f"<b>Match ID</b> - <i>{show_match.match_ID}</i> \n <b>Number of players</b> - <i>{show_match.players_count}</i> \n <b>Players</b> \n<b>dsdsd</b>\n<b>✅✅ The game started✅✅</b>",parse_mode=ParseMode.HTML)
@@ -220,3 +244,24 @@ async def empty_handler(message:Message):
 
     else:
         print('oddiy rejim')
+=======
+    get_msg_id=BotFuctions.get_msg_id()
+    show_user=BotFuctions.show_user()
+    for i in show_user:
+        print(show_user)
+    #for i,i2 in zip(show_user,get_msg_id.split(',')):
+    #    print(i.user_id,i2)
+    #BotFuctions.start()
+@router.callback_query(F.data=='end')
+async def end_game(callback:CallbackQuery):
+    pass
+
+@router.message()
+async def empty_handler(message:Message):
+    #get_msg=BotFuctions.get_msg(user_id=message.from_user.id)
+    #print(get_msg.split(sep=','))
+    #get_user=BotFuctions.get_user(user_id=message.from_user.id)
+    #for i,i2 in zip(get_user,get_msg.split(',')):
+    #   await bot.edit_message_text(chat_id=i.user_id,message_id=int(i2),text='If 🫵 want to finish the game.Click  the button ')
+    pass
+>>>>>>> cc2a360813dbeaecee55531344401fe2ccc62cbf
