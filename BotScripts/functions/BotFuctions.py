@@ -66,15 +66,52 @@ def connect_user(user_id,user_name):
     data.players_count+=1
     data.save()
 
+def check_players_count():
+    data=MatchList.objects.get(start_game=False)
+    return data.players_count
+
+def change_game_status():
+    data=MatchList.objects.last()
+    data.start_game=True
+    data.save()
+    data2=GamersList.objects.filter(match_ID=data.match_ID)
+    for i in data2:
+        i.start_game=True
+        i.save()
+        return i.user_id
+
+def get_msg_id():
+    data=MatchList.objects.get(start_game=False)
+    return data.send_msg_id
+
 def show_match():
     data=MatchList.objects.get(start_game=False)
     return data
 
 def show_user():
     data=MatchList.objects.get(start_game=False)
-    data2=GamersList.objects.filter(match_ID=data.match_ID)
-    return data2
+    data2=GamersList.objects.filter(match_ID=data.match_ID).all()
+    for i in data2:
+        print(i.user_id)
+        return i.user_id
+# function gameinfo_msg_id from Matchlist
+def gameinfo_msg_bool():
+    data=MatchList.objects.get(start_game=False)
+    if data.players_count<=2:
+        return True
+    else:
+        return False
 
+def gameinfo_msg():
+    data=MatchList.objects.get(start_game=False)
+    return data.gameinfo_msg_id
+
+
+def gameinfo_msg_id():
+    data=MatchList.objects.get(start_game=False)
+    return data.gameinfo_msg_id
+
+# function send_msg_id from matchlist
 def send_msg():
     data=MatchList.objects.get(start_game=False)
     data2=GamersList.objects.filter(match_ID=data.match_ID,send_msg=False)  
@@ -96,6 +133,33 @@ def msg_id(send_id):
         data.send_msg_id=send_id
         data.save()
 
+def get_msg_booln():
+    data=MatchList.objects.get(start_game=False)
+    if data.players_count<=2:
+        return True
+    else:
+        return False
+def get_msg():
+    data=MatchList.objects.get(start_game=False)
+    return data.send_msg_id
+
+def get_msg2():
+    data=MatchList.objects.get(start_game=False)
+    return data.send_msg_id
+
+def get_user():
+    data=GamersList.objects.get(progress='active')
+    data2=GamersList.objects.filter(match_ID=data.match_ID)
+    return data2
+
+def start():
+    data=MatchList.objects.get(start_game=False)
+    data2=GamersList.objects.filter(match_ID=data.match_ID)
+    for i in data2:
+        i.start_game=True
+        i.save()
+        data.start_game=True
+        data.save()
 
 
 

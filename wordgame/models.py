@@ -16,6 +16,7 @@ class MatchList(models.Model):
     start_game=models.BooleanField(default=False)
     finished=models.BooleanField(default=False)
     progress=models.CharField(max_length=20,default='no active')
+    gameinfo_msg_id=models.CharField(max_length=300,null=True,blank=True)
     send_msg_id=models.CharField(null=True,blank=True,max_length=300)
     created_at=models.DateTimeField(auto_now_add=True,db_index=True)
     DisplyFields=['match_ID','channel_name','channel_ID','start_game']
