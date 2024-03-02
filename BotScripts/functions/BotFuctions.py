@@ -18,7 +18,7 @@ def exists_game():
             exists=True
             return exists
     except (UnboundLocalError,ObjectDoesNotExist):
-        return exists
+        return exists 
 
 def exists_user(user_id):
     exists='no active'
@@ -80,12 +80,6 @@ def change_game_status():
         i.save()
         return i.user_id
 
-<<<<<<< HEAD
-=======
-def get_msg_id():
-    data=MatchList.objects.get(start_game=False)
-    return data.send_msg_id
->>>>>>> cc2a360813dbeaecee55531344401fe2ccc62cbf
 
 def show_match():
     data=MatchList.objects.get(start_game=False)
@@ -93,7 +87,6 @@ def show_match():
 
 def show_user():
     data=MatchList.objects.get(start_game=False)
-<<<<<<< HEAD
     data2=GamersList.objects.filter(match_ID=data.match_ID)
     return data2
 # compare player count
@@ -111,20 +104,6 @@ def gameinfo_msg_bool():
     else:
         return False
 
-=======
-    data2=GamersList.objects.filter(match_ID=data.match_ID).all()
-    for i in data2:
-        print(i.user_id)
-        return i.user_id
-# function gameinfo_msg_id from Matchlist
-def gameinfo_msg_bool():
-    data=MatchList.objects.get(start_game=False)
-    if data.players_count<=2:
-        return True
-    else:
-        return False
-
->>>>>>> cc2a360813dbeaecee55531344401fe2ccc62cbf
 def gameinfo_msg():
     data=MatchList.objects.get(start_game=False)
     return data.gameinfo_msg_id
@@ -225,42 +204,23 @@ def last_word_save(match_id,last_letter,text):
         data.founded_word=text
         data.save()
 
-<<<<<<< HEAD
-def chance_count(match_id,user_id):
-    data=GamersList.objects.get(user_id=user_id,match_ID=match_id)
+def update_chance(user_id):
+    data=GamersList.objects.filter(user_id=user_id,progress='active')
+    for i in data:
+        return i.chance
     
-=======
-def get_msg_booln():
-    data=MatchList.objects.get(start_game=False)
-    if data.players_count<=2:
-        return True
-    else:
-        return False
-def get_msg():
-    data=MatchList.objects.get(start_game=False)
-    return data.send_msg_id
 
-def get_msg2():
-    data=MatchList.objects.get(start_game=False)
-    return data.send_msg_id
-
-def get_user():
-    data=GamersList.objects.get(progress='active')
-    data2=GamersList.objects.filter(match_ID=data.match_ID)
-    return data2
-
-def start():
-    data=MatchList.objects.get(start_game=False)
-    data2=GamersList.objects.filter(match_ID=data.match_ID)
-    for i in data2:
-        i.start_game=True
+def chance_count(match_id,user_id):
+    data=GamersList.objects.filter(user_id=user_id,match_ID=match_id)
+    for i in data:
+        i.chance-=1
         i.save()
-        data.start_game=True
-        data.save()
-
-
-
->>>>>>> cc2a360813dbeaecee55531344401fe2ccc62cbf
+    if i.chance==0:
+        i.progress='no active'
+        i.save()
+        i.finished=True
+        i.save() 
+    
 
 
 
