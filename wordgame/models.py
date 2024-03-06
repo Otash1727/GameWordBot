@@ -21,7 +21,7 @@ class MatchList(models.Model):
     gameinfo_msg_id=models.CharField(max_length=300,null=True,blank=True)
     send_msg_id=models.PositiveIntegerField(null=True,blank=True)
     created_at=models.DateTimeField(auto_now_add=True,db_index=True)
-    DisplyFields=['match_ID','channel_name','channel_ID','start_game']
+    DisplyFields=['match_ID','channel_name','channel_ID','start_game','finished']
     SearchFilds=['channel_ID','channel_name','match_ID','players_count','word_count']
     FiltersFields=['channel_name']
         
@@ -47,7 +47,7 @@ class GamersList(models.Model):
     send_msg=models.BooleanField(default=False)
     created_at=models.DateTimeField(auto_now_add=True,db_index=True)
     Match_List=models.ForeignKey(to=MatchList,on_delete=models.CASCADE,null=True,blank=True)  
-    DisplayFields=['match_ID','user_name']
+    DisplayFields=['match_ID','user_name','progress','finished']
     SearchFields=['match_ID','user_id','user_name','found_word_count']
     FiltersFields=['found_word_count']
     def clone_matchID(cloned):

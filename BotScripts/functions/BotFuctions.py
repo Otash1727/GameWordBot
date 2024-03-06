@@ -1,4 +1,4 @@
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist,MultipleObjectsReturned
 from BotScripts.create_bot import bot
 from wordgame.models import MatchList,GamersList,ChempionsList,EnglishDictionary
 import os
@@ -169,6 +169,8 @@ def current_id(user_id):
     data2=MatchList.objects.get(match_ID=i.match_ID)
     return data2.queue,i.queue,i.chance,i.match_ID
 
+
+
 def count_queue(match_id):
     last_match=MatchList.objects.filter(match_ID=match_id)
     for i in last_match:
@@ -183,15 +185,31 @@ def show_player(match_id):
     data=GamersList.objects.filter(match_ID=match_id)
     return data
 
+def show_player_update(match_id):
+    data=GamersList.objects.filter(match_ID=match_id,progress='active')
+    return data
+
 def update_queue(match_id):
     data=MatchList.objects.get(match_ID=match_id)
     data.queue=1
     data.save()
 
 def next_queue(match_id):
-    data=MatchList.objects.get(match_ID=match_id)
-    data2=GamersList.objects.get(queue=data.queue)
-    return data2
+        data=MatchList.objects.get(match_ID=match_id)
+        data2=GamersList.objects.filter(queue=data.queue)
+        for i in data2:
+            pass            
+        if i.progress=='no active':
+            data.queue+=1
+            data.save()
+            data3=GamersList.objects.filter(match_ID=match_id,queue=data.queue)
+            for i2 in data3:
+                return i2
+        else:
+            return i
+       
+        
+
 
 def last_word_save(match_id,last_letter,text):
     data=MatchList.objects.get(match_ID=match_id)
@@ -221,8 +239,43 @@ def chance_count(match_id,user_id):
         i.finished=True
         i.save() 
     
+### last letter
+def letter_last(match_id):
+    data=MatchList.objects.filter(match_ID=match_id)
+    for i in data:
+        return i.last_latter
 
 
+
+# lose functions
+def lose_lose(match_id):
+    data=GamersList.objects.filter(progress='active')
+    return data
+
+
+def finish_game(match_id,user_id):
+    data=MatchList.objects.filter(match_ID=match_id)
+    data2=GamersList.objects.filter(match_ID=match_id,user_id=user_id)
+    for i,i2 in zip(data,data2):
+        i.finished=True
+        i.save()
+        i2.progress='no active'
+        i2.finished=True
+        i2.save()
+    
+#start game msg
+def start_game_msg():
+    data=MatchList.objects.last()
+    data2=GamersList.objects.filter(match_ID=data.match_ID)
+    return data2
+# send the end game
+def to_complate(user_id):
+    data=GamersList.objects.filter(progress='active',user_id=user_id)
+    for i in data:
+        i.progress='no active'
+        i.finished=True
+        i.save()
+    
 
 
 def off():
